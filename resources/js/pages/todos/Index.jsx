@@ -25,7 +25,16 @@ export default function Index({ todos, filters, stats }) {
 
   const onCreate = (e) => {
     e.preventDefault()
-    create.post(route('todos.store'))
+    create.post(route('todos.store'), {
+      onSuccess: () => {
+        // ✅ Reset form state
+        create.reset()
+
+        // ✅ Pastikan textarea kosong (khusus catatan)
+        const noteField = document.querySelector('textarea[name="note"]')
+        if (noteField) noteField.value = ''
+      },
+    })
   }
 
   const onDelete = (id) => {
