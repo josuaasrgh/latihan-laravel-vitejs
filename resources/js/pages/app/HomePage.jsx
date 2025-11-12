@@ -1,7 +1,8 @@
 import React from "react";
 import AppLayout from "@/layouts/AppLayout";
 import { Button } from "@/components/ui/button";
-import { usePage } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react"; 
+
 
 export default function HomePage() {
     const { auth } = usePage().props;
@@ -23,9 +24,12 @@ export default function HomePage() {
                         <p className="text-xl text-muted-foreground">
                             Apa yang ingin kamu pelajari hari ini?
                         </p>
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white mt-5">
+                        <Link
+                            href={route('todos.index')}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
                             Buat Rencana
-                        </Button>
+                        </Link>
                     </div>
                     {/* Technologies Grid */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></div>

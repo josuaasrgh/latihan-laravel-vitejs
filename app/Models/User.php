@@ -45,4 +45,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relasi: satu user punya banyak todos
+     */
+    public function todos()
+    {
+        return $this->hasMany(\App\Models\Todo::class);
+    }
 }
