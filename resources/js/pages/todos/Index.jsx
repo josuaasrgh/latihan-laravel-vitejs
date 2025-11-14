@@ -1,10 +1,12 @@
 // resources/js/Pages/Todos/Index.jsx
-import { useForm, usePage, Link, router } from '@inertiajs/react'
+import { useForm, usePage, Link } from '@inertiajs/react'
+import { router } from '@inertiajs/react'
 import { useEffect } from 'react'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import Chart from 'react-apexcharts'
 import { route } from 'ziggy-js'
+
 
 // ✅ import Trix
 import 'trix/dist/trix.css'
@@ -47,20 +49,36 @@ export default function Index({ todos, filters, stats }) {
   // ✅ Hapus todo
   const onDelete = (id) => {
     Swal.fire({
-      title: 'Hapus todo?',
-      icon: 'warning',
+      title: "Hapus todo?",
+      text: "Data yang dihapus tidak dapat dikembalikan.",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Ya, hapus',
+      confirmButtonText: "Ya, hapus",
     }).then((res) => {
-      if (res.isConfirmed) router.delete(route('todos.destroy', id))
-    })
-  }
+      if (res.isConfirmed) {
+        router.delete(route("todos.destroy", id), {
+          onSuccess: () =>
+            Swal.fire("Terhapus", "Todo berhasil dihapus", "success"),
+          onError: () =>
+            Swal.fire("Gagal", "Tidak dapat menghapus todo", "error"),
+        });
+      }
+    });
+  };
+
 
   // ✅ Terapkan filter
   const onFilter = (e) => {
     e.preventDefault()
-    router.get(route('todos.index'), filter.data())
+
+    
+    const params = Object.fromEntries(
+      Object.entries(filter.data()).filter(([_, v]) => v !== '' && v !== null)
+    )
+
+    router.get(route('todos.index'), params, { preserveState: true })
   }
+
 
   return (
     <div className="p-6 space-y-8 bg-gray-900 min-h-screen text-gray-100">
@@ -256,16 +274,24 @@ export default function Index({ todos, filters, stats }) {
                   {t.status !== 'done' ? (
                     <button
                       onClick={() =>
-                        router.put(route('todos.update', t.id), { status: 'done' })
+                        router.put(route('todos.update', t.id), { status: 'done' }, {
+                          onSuccess: () => Swal.fire("Berhasil", "Todo ditandai selesai", "success"),
+                          onError: () => Swal.fire("Gagal", "Terjadi kesalahan", "error"),
+                        })
                       }
                       className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-md text-sm"
                     >
                       Tandai Selesai
                     </button>
+
                   ) : (
                     <button
                       onClick={() =>
-                        router.put(route('todos.update', t.id), { status: 'open' })
+                        router.put(route('todos.update', t.id), { status: 'open' }, {
+                          onSuccess: () => Swal.fire("Berhasil", "Todo dibuka kembali", "success"),
+                          onError: () => Swal.fire("Gagal", "Terjadi kesalahan", "error"),
+                        })
+
                       }
                       className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded-md text-sm"
                     >
@@ -290,7 +316,11 @@ export default function Index({ todos, filters, stats }) {
                         if (!file) return
                         const form = new FormData()
                         form.append('cover', file)
-                        router.post(route('todos.cover', t.id), form)
+                        router.post(route('todos.cover', t.id), form, {
+                          onSuccess: () => Swal.fire("Berhasil", "Cover berhasil diperbarui", "success"),
+                          onError: () => Swal.fire("Gagal", "Format tidak valid atau ukuran terlalu besar", "error"),
+                        })
+
                       }}
                     />
                   </label>
